@@ -4,18 +4,19 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import fileUpload from 'express-fileupload'
 import  {dbconnection} from './database/dbconnect.js';
+import messageRouter from "./Router/messageRouter.js";
 
 
 const app=express();
 config({path: "./config/config.env"})
 
-app.use('/', express.static('public', {
-    setHeaders: (res, path) => {
-      if (path.endsWith('.js')) {
-        res.setHeader('Content-Type', 'text/javascript');
-      }
-    }
-  }));
+// app.use('/', express.static('public', {
+//     setHeaders: (res, path) => {
+//       if (path.endsWith('.js')) {
+//         res.setHeader('Content-Type', 'text/javascript');
+//       }
+//     }
+//   }));
   
 app.use(
     cors({
@@ -36,6 +37,8 @@ app.use(fileUpload({
     tempFileDir:"/tmp",
 })) //for uploading files.
 
+
+app.use('/api/v1/message',messageRouter);
 
 dbconnection();
 
