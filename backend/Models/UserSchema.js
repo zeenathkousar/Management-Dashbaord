@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import validator from "validator";
 
-const messageSchema=new mongoose.Schema({
+const userSchema= new mongoose.Schema({
     firstName:{
         type:String,
         required:true,
@@ -23,12 +23,15 @@ const messageSchema=new mongoose.Schema({
         minLength:[11,"Phone Number must contain exact 11 Digits"],
       maxLength:[11,"Phone Number must contain exact 11 Digits"]
     },
-    message:{
+    nic:{
         type:String,
         required:true,
-        minLength:[10,"Message must contain atleast 10 characters!"],
+        minLength:[13,"nic must contain exact 13 digits"],
+        maxLength:[13,"nic must contain exact 13 digits"],
+
     },
+
 
 })
 
-export const Message=mongoose.model('collectionMessage',messageSchema)
+export const usermodel=mongoose.model('UserCollection',userSchema)
