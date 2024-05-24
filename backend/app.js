@@ -6,6 +6,7 @@ import fileUpload from 'express-fileupload'
 import  {dbconnection} from './database/dbconnect.js';
 import messageRouter from "./Router/messageRouter.js";
 import { errorMiddleware } from './middlewares/errorMidleware.js';
+import userRouter from './Router/userRouter.js'
 
 
 const app=express();
@@ -40,6 +41,8 @@ app.use(fileUpload({
 
 
 app.use('/api/v1/message',messageRouter);
+app.use('/api/v1/user',userRouter)
+
 
 app.get('/',(req,res)=>{
     res.send('hello app')

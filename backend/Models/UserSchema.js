@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 import validator from "validator";
+import bcrypt from "bcrypt";
+
 
 const userSchema= new mongoose.Schema({
     firstName:{
@@ -26,12 +28,55 @@ const userSchema= new mongoose.Schema({
     nic:{
         type:String,
         required:true,
-        minLength:[13,"nic must contain exact 13 digits"],
-        maxLength:[13,"nic must contain exact 13 digits"],
+        minLength:[13,"NIC must contain exact 13 digits"],
+        maxLength:[13,"NIC must contain exact 13 digits"],
 
     },
+    dob:{
+        type:Date,
+        required:[true,"DOB is required"],
+
+    },
+    gender:{
+        type:String,
+        required:true,
+        enum:["Male","Female"]
+    },
+    password:{
+        type:String,
+        minLength:[8,"Password must contain atleast 8 characters"],
+        required:true,
+        select:false,
+    },
+    role:{
+        type:String,
+        required:true,
+        enum:["Admin","Pateint"]
+    },
+    doctorDepartment:{
+        type:String
+    },
+    docAvtar:{
+        public_id:String,
+        url:String,
+    }
 
 
-})
+});
+userSchema.pre("save",async function(next){
+    if(!this.isModified("password")){
+        next()
+    }
+    this.password=await bcrypt.hash(this.password,10)
+});
 
+
+userSchema.methods.comparePassword=async function(enteredPassword){
+        return await bcrypt.compare(enteredPassword,this.password)
+}
+userSchema.methods.generateJsonWebToken=function(){
+        return jwt.sign({id: this._id}, process.env.JWT_SECRETKEY,{
+            expiresIn : process.env.JWT_EXPIRES,
+        })
+}
 export const usermodel=mongoose.model('UserCollection',userSchema)
