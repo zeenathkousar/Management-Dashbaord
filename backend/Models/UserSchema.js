@@ -51,7 +51,7 @@ const userSchema= new mongoose.Schema({
     role:{
         type:String,
         required:true,
-        enum:["Admin","Pateint"]
+        enum:["Admin","Patient"]
     },
     doctorDepartment:{
         type:String

@@ -9,7 +9,7 @@ export const sendMessage= catchAsyncErrors(async(req,res,next) =>{
         //     success:false,
         //     message:"Please Fill All Fields in the Form"
         // });
-        return next(new ErrorHandler("Please fill All fields of form"))
+        return next(new ErrorHandler("Please fill All fields of form!!",500))
     }
 
     // console.log(req.body);
