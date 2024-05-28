@@ -64,7 +64,7 @@ export const addNewAdmin=catchAsyncErrors(async(req,res,next)=>{
     }
     const isRegistered= await usermodel.findOne({email});
     if(isRegistered){
-        return next(new ErrorHandler("Admin with this email already exists "));
+        return next(new ErrorHandler(`${isRegistered.role} with this email already exists` ));
     }
     const admin=await usermodel.create({firstName, lastName, email, phone, password, gender, dob, nic,role:"Admin",});
     res.status(200).json({
