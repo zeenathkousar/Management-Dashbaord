@@ -2,6 +2,7 @@ import { catchAsyncErrors } from "../middlewares/catchAsyncErrors.js";
 import ErrorHandler from "../middlewares/errorMidleware.js";
 import { usermodel } from "../Models/UserSchema.js";
 import { generateToken } from "../utils/jwtToken.js";
+import cloudinary from "cloudinary"
 
 
 export const patientRegister = catchAsyncErrors(async(req, res, next)=>{
@@ -70,6 +71,88 @@ export const addNewAdmin=catchAsyncErrors(async(req,res,next)=>{
     res.status(200).json({
         success:true,
         message:"New Admin Registered"
+    })
+
+
+})
+
+export const getAllDoctors=catchAsyncErrors(async(req,res,next)=>{
+    const doctors=await usermodel.find({role: "Doctor"});
+    res.status(200).json({
+        success : true,
+        doctors
+    })
+
+})
+
+export const getUserDetails=catchAsyncErrors(async(req,res,next)=>{
+    const user=req.user;
+    res.status(200).json({
+        success:true,
+        user
+    })
+
+})
+
+export const adminLogout=catchAsyncErrors(async(req,res,next)=>{
+    res.status(200).cookie("adminToken","",{
+        httpOnly:true,
+        expires: new Date(Date.now())
+    }).json({
+        success:true,
+        message:"Admin Loggedout Successfully"
+    })
+})
+
+
+export const patientLogout=catchAsyncErrors(async(req,res,next)=>{
+    res.status(200).cookie("patientToken","",{
+        httpOnly:true,
+        expires: new Date(Date.now())
+    }).json({
+        success:true,
+        message:"Patient Loggedout Successfully"
+    })
+})
+
+export const addNewDoctor=catchAsyncErrors(async(req,res,next)=>{
+    if(!req.files || Object.keys(req.files).length === 0){
+        return next(new ErrorHandler("Doctor Avatar Required!!",400))
+    }
+    const {docAvatar}=req.files;
+    const allowedFormats=["/image/png","/image/jpeg","/image/webp"];
+    if(!allowedFormats.includes(docAvatar.mimetype)){
+        return next(new ErrorHandler("File Format is not supported!!"),400)
+    }
+    const {firstName, lastName, email, phone, password, gender, dob, nic,doctorDepartment} = req.body;
+    if(!firstName || !lastName || !email || !phone ||  !password || !gender || !dob|| ! nic||!doctorDepartment){
+        return next(new ErrorHandler("Please FillFull Details!!"),400)
+    }
+    const isRegistered=await usermodel.findOne({email});
+    if(isRegistered){
+        return next(new ErrorHandler(`${isRegistered.role} is already registered with this email!`),400)
+
+
+    }
+    //pasting image on cloudinary.
+    const cloudianryResponse=await cloudinary.uploader.upload(
+        docAvtar.tempFilePath
+    );
+    if(!cloudianryResponse || cloudianryResponse.error){
+        console.error("Cloudinary Error:",cloudianryResponse.error || "unknown cloudinary error")
+
+    }
+    //creating user now.
+    const doctor=   await usermodel.create({
+        firstName, lastName, email, phone, password, gender, dob, nic,doctorDepartment,role:"Doctor",docAvtar:{
+            public_id:cloudianryResponse.public_id,
+            url:cloudinaryResponse.secure_url,
+        }
+    });
+    res.status(200).json({
+        success:true,
+        message:"New Doctor Registered",
+        doctor
     })
 
 
