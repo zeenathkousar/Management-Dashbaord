@@ -52,12 +52,12 @@ const userSchema= new mongoose.Schema({
     role:{
         type:String,
         required:true,
-        enum:["Admin","Patient"]
+        enum:["Admin","Patient","Doctor"]
     },
     doctorDepartment:{
         type:String
     },
-    docAvtar:{
+    docAvatar:{
         public_id:String,
         url:String,
     }

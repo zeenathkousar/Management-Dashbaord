@@ -120,11 +120,14 @@ export const addNewDoctor=catchAsyncErrors(async(req,res,next)=>{
         return next(new ErrorHandler("Doctor Avatar Required!!",400))
     }
     const {docAvatar}=req.files;
-    const allowedFormats=["/image/png","/image/jpeg","/image/webp"];
+    console.log(req.files)
+    const allowedFormats=["image/png","image/jpeg","image/webp"];
+    console.log(`docavatar is :${docAvatar}`)
     if(!allowedFormats.includes(docAvatar.mimetype)){
         return next(new ErrorHandler("File Format is not supported!!"),400)
     }
     const {firstName, lastName, email, phone, password, gender, dob, nic,doctorDepartment} = req.body;
+    console.log(req.body)
     if(!firstName || !lastName || !email || !phone ||  !password || !gender || !dob|| ! nic||!doctorDepartment){
         return next(new ErrorHandler("Please FillFull Details!!"),400)
     }
@@ -135,17 +138,17 @@ export const addNewDoctor=catchAsyncErrors(async(req,res,next)=>{
 
     }
     //pasting image on cloudinary.
-    const cloudianryResponse=await cloudinary.uploader.upload(
-        docAvtar.tempFilePath
+    const cloudinaryResponse=await cloudinary.uploader.upload(
+        docAvatar.tempFilePath
     );
-    if(!cloudianryResponse || cloudianryResponse.error){
-        console.error("Cloudinary Error:",cloudianryResponse.error || "unknown cloudinary error")
+    if(!cloudinaryResponse || cloudinaryResponse.error){
+        console.error("Cloudinary Error:",cloudinaryResponse.error || "unknown cloudinary error")
 
     }
     //creating user now.
     const doctor=   await usermodel.create({
-        firstName, lastName, email, phone, password, gender, dob, nic,doctorDepartment,role:"Doctor",docAvtar:{
-            public_id:cloudianryResponse.public_id,
+        firstName, lastName, email, phone, password, gender, dob, nic,doctorDepartment,role:"Doctor",docAvatar:{
+            public_id:cloudinaryResponse.public_id,
             url:cloudinaryResponse.secure_url,
         }
     });
