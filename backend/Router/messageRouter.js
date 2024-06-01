@@ -5,6 +5,6 @@ import { isAdminAuthenticated,isPatientAuthenticated } from "../middlewares/auth
 const router=express.Router();
 
 router.post("/send",sendMessage);
-router.get('/getall',isAdminAuthenticated,getAllMessages)
+router.get('/getallmessages',isAdminAuthenticated,getAllMessages)
 
 export default router
